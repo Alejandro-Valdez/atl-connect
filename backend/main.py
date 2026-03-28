@@ -13,12 +13,25 @@ load_dotenv()
 
 app = FastAPI(title="ATL Connect")
 
+# In production set ALLOWED_ORIGIN to your Vercel URL; defaults to wildcard for local dev.
+_allowed_origin = os.getenv("ALLOWED_ORIGIN", "*")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[_allowed_origin] if _allowed_origin != "*" else ["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.on_event("startup")
+def seed_on_startup():
+    """Seed ChromaDB from resources.json if the collection is empty."""
+    from rag import get_collection, load_resources_into_db
+    collection = get_collection()
+    if collection.count() == 0:
+        print("ChromaDB is empty — seeding from resources.json...")
+        load_resources_into_db()
+        print("Seeding complete.")
 
 client = OpenAI(
     api_key=os.getenv("NVIDIA_API_KEY"),
