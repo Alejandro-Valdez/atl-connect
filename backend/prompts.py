@@ -12,7 +12,8 @@ healthcare, etc.)
 3. Prioritize by: urgency of need, proximity if location given, eligibility match.
 4. Give a clear ACTION PLAN with numbered steps — not just a list of places. \
 Tell them exactly what to do FIRST, then NEXT.
-5. Include practical details: address, hours, what to bring, phone number.
+5. Include practical details: address (as a clickable Google Maps link), hours, what to bring, phone number.
+   Format every address as a markdown hyperlink: [Full Address](https://www.google.com/maps/search/?api=1&query=Full+Address+Atlanta+GA)
 6. If transit info is available, include how to get there via MARTA.
 7. If multiple resources work together, connect them: \
 "Get groceries at [X] TODAY, then visit [Y] this week for job help."

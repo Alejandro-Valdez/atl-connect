@@ -6,6 +6,7 @@ from openai import OpenAI
 
 from models import ChatRequest, ChatResponse
 from rag import get_relevant_resources, get_all_resources
+from search import search_realtime_resources
 from prompts import SYSTEM_PROMPT
 
 load_dotenv()
@@ -32,10 +33,13 @@ def health():
 
 @app.post("/chat", response_model=ChatResponse)
 def chat(req: ChatRequest):
-    # 1 — Retrieve relevant resources via RAG
+    # 1 — Retrieve relevant resources via RAG (local database)
     relevant_resources = get_relevant_resources(req.message)
 
-    # 2 — Format resource context
+    # 2 — Fetch real-time results via Serper
+    live_results = search_realtime_resources(req.message, req.user_lat, req.user_lng)
+
+    # 3 — Format RAG resource context
     resource_context = "\n\n".join(
         f"**{r['name']}**\n"
         f"Category: {r['category']}\n"
@@ -49,12 +53,26 @@ def chat(req: ChatRequest):
         for r in relevant_resources
     )
 
-    # 3 — Build messages
+    # 4 — Format live search context
+    live_context = ""
+    if live_results:
+        live_context = "\n\n**Real-time search results:**\n" + "\n\n".join(
+            f"- **{r.get('title', '')}**"
+            + (f"\n  Address: {r['address']}" if r.get("address") else "")
+            + (f"\n  Phone: {r['phone']}" if r.get("phone") else "")
+            + (f"\n  {r.get('snippet', '')}" if r.get("snippet") else "")
+            + (f"\n  Link: {r['link']}" if r.get("link") else "")
+            for r in live_results
+        )
+
+    # 5 — Build messages
     messages = list(req.conversation_history)
 
-    location_line = (
-        f"User's location: {req.user_location}\n" if req.user_location else ""
-    )
+    location_line = ""
+    if req.user_location:
+        location_line = f"User's location: {req.user_location}\n"
+    elif req.user_lat and req.user_lng:
+        location_line = f"User's coordinates: {req.user_lat}, {req.user_lng} (Atlanta area)\n"
 
     messages.append({
         "role": "user",
@@ -62,9 +80,12 @@ def chat(req: ChatRequest):
             f"User's question: {req.message}\n\n"
             f"{location_line}"
             f"Here are the relevant Atlanta community resources I found:\n\n"
-            f"{resource_context}\n\n"
-            f"Use ONLY these resources in your response. "
-            f"Do not make up any resources."
+            f"{resource_context}"
+            f"{live_context}\n\n"
+            f"Use the resources above to give the best answer. "
+            f"For any address you mention, format it as a Google Maps hyperlink: "
+            f"[Full Address](https://www.google.com/maps/search/?api=1&query=Full+Address+Atlanta+GA). "
+            f"Do not invent resources not listed above."
         ),
     })
 

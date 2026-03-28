@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ATL Connect</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <div class="logo">
+        <span class="logo-icon">📍</span>
+        <h1>ATL Connect</h1>
+      </div>
+      <p class="tagline">Your AI guide to Atlanta community resources</p>
+      <span id="locationIndicator" class="location-indicator">📍 Detecting location...</span>
+    </header>
+
+    <div class="categories">
+      <button class="cat-btn" data-query="I need help finding food near me">🍎 Food</button>
+      <button class="cat-btn" data-query="I need help with housing or shelter">🏠 Housing</button>
+      <button class="cat-btn" data-query="I'm looking for job training and career help">💼 Jobs</button>
+      <button class="cat-btn" data-query="I need help with bills and financial assistance">💰 Financial</button>
+      <button class="cat-btn" data-query="I need affordable healthcare or a doctor">🏥 Health</button>
+      <button class="cat-btn" data-query="I need free legal help">⚖️ Legal</button>
+    </div>
+
+    <div class="chat-container" id="chatContainer">
+      <div class="message bot-message">
+        <div class="message-content">
+          <strong>ATL Connect</strong>
+          <p>Hey there! I'm ATL Connect — I help Atlanta residents find community
+          resources like food assistance, housing, job training, financial help,
+          healthcare, and legal aid.</p>
+          <p>Tell me what you need help with, or tap a category above to get started.
+          The more you share about your situation, the better I can help.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-area">
+      <div class="input-wrapper">
+        <input type="text" id="userInput" placeholder="Tell me what you need help with..." autocomplete="off" />
+        <button id="sendBtn" onclick="sendMessage()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
+      </div>
+      <p class="disclaimer">ATL Connect uses AI to match you with real Atlanta resources.
+      Always verify details by calling ahead. For emergencies, dial 911.</p>
+    </div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
