@@ -2,7 +2,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
-import anthropic
+from openai import OpenAI
 
 from models import ChatRequest, ChatResponse
 from rag import get_relevant_resources, get_all_resources
@@ -19,7 +19,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+client = OpenAI(
+    api_key=os.getenv("NVIDIA_API_KEY"),
+    base_url="https://integrate.api.nvidia.com/v1",
+)
 
 
 @app.get("/health")
@@ -65,15 +68,17 @@ def chat(req: ChatRequest):
         ),
     })
 
-    # 4 — Call Claude
-    response = client.messages.create(
-        model="claude-sonnet-4-20250514",
+    # 4 — Call model via OpenRouter
+    response = client.chat.completions.create(
+        model="moonshotai/kimi-k2.5",
         max_tokens=1024,
-        system=SYSTEM_PROMPT,
-        messages=messages,
+        temperature=1.0,
+        top_p=1.0,
+        messages=[{"role": "system", "content": SYSTEM_PROMPT}] + messages,
+        extra_body={"chat_template_kwargs": {"thinking": False}},
     )
 
-    reply = response.content[0].text
+    reply = response.choices[0].message.content
 
     return ChatResponse(
         reply=reply,
