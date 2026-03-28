@@ -4,32 +4,6 @@ const userInput = document.getElementById("userInput");
 const sendBtn = document.getElementById("sendBtn");
 
 let conversationHistory = [];
-let userLat = null;
-let userLng = null;
-let userLocation = "";
-
-// Request geolocation on load
-if (navigator.geolocation) {
-  navigator.geolocation.getCurrentPosition(
-    (pos) => {
-      userLat = pos.coords.latitude;
-      userLng = pos.coords.longitude;
-      userLocation = `${userLat.toFixed(4)}, ${userLng.toFixed(4)}`;
-      const indicator = document.getElementById("locationIndicator");
-      if (indicator) {
-        indicator.textContent = "📍 Location detected";
-        indicator.style.color = "#22c55e";
-      }
-    },
-    () => {
-      const indicator = document.getElementById("locationIndicator");
-      if (indicator) {
-        indicator.textContent = "📍 Location unavailable";
-        indicator.style.color = "#94a3b8";
-      }
-    }
-  );
-}
 
 document.querySelectorAll(".cat-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
@@ -62,9 +36,6 @@ async function sendMessage() {
       body: JSON.stringify({
         message,
         conversation_history: conversationHistory,
-        user_location: userLocation,
-        user_lat: userLat,
-        user_lng: userLng,
       }),
     });
 
@@ -110,11 +81,6 @@ function addMessage(text, sender) {
 }
 
 function formatResponse(text) {
-  // Markdown links → <a> tags (safe: only allow http/https URLs)
-  text = text.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, (_, label, url) => {
-    const safeUrl = url.replace(/"/g, "%22");
-    return `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer">${label}</a>`;
-  });
   text = text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
   text = text.replace(/^(\d+)\.\s/gm, "<br><strong>$1.</strong> ");
   return text

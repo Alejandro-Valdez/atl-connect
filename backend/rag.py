@@ -1,12 +1,6 @@
 import json
-import os
 import chromadb
 from chromadb.utils import embedding_functions
-
-# Resolve the resources.json path relative to this file, so it works
-# regardless of the working directory (local dev or Railway deployment).
-_HERE = os.path.dirname(os.path.abspath(__file__))
-DEFAULT_RESOURCES_PATH = os.path.join(_HERE, "..", "data", "resources.json")
 
 ef = embedding_functions.SentenceTransformerEmbeddingFunction(
     model_name="all-MiniLM-L6-v2"
@@ -24,11 +18,9 @@ def get_collection():
     )
 
 
-def load_resources_into_db(json_path=None):
-    """Load resource data from JSON into ChromaDB. Called automatically on startup if DB is empty."""
-    if json_path is None:
-        json_path = DEFAULT_RESOURCES_PATH
-    with open(json_path, "r", encoding="utf-8") as f:
+def load_resources_into_db(json_path="../data/resources.json"):
+    """Load resource data from JSON into ChromaDB. Run once via seed_db.py."""
+    with open(json_path, "r") as f:
         resources = json.load(f)
 
     collection = get_collection()
